@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:18.04
 
 WORKDIR /root
 
@@ -6,6 +6,7 @@ WORKDIR /root
 # set environment vars
 ENV HADOOP_HOME /opt/hadoop
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
+ENV PATH=$PATH:/usr/local/hadoop/bin:/usr/local/hadoop/sbin 
 
 # install packages
 RUN \
@@ -18,9 +19,9 @@ RUN \
 
 # download and extract hadoop, set JAVA_HOME in hadoop-env.sh, update path
 RUN \
-  wget http://apache.mirrors.tds.net/hadoop/common/hadoop-2.8.1/hadoop-2.8.1.tar.gz && \
-  tar -xzf hadoop-2.8.1.tar.gz && \
-  mv hadoop-2.8.1 $HADOOP_HOME && \
+  wget https://archive.apache.org/dist/hadoop/core/hadoop-2.7.3/hadoop-2.7.3.tar.gz && \
+  tar -xvf hadoop-2.7.3.tar.gz && \
+  mv hadoop-2.7.3 $HADOOP_HOME && \
   echo "export JAVA_HOME=$JAVA_HOME" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh && \
   echo "PATH=$PATH:$HADOOP_HOME/bin" >> ~/.bashrc
 
@@ -58,7 +59,8 @@ RUN chmod +x ~/start-hadoop.sh && \
 EXPOSE 8088 50070 50075 50030 50060 7077 16010 8084 8041 8042
 
 # format namenode
-RUN /usr/local/hadoop/bin/hdfs namenode -format
+#RUN /usr/local/hadoop/bin/hdfs namenode -format
+RUN $HADOOP_HOME/bin/hdfs namenode -format
 
 CMD [ "sh", "-c", "service ssh start; bash"]
 
